@@ -1,21 +1,26 @@
 #include <Arduino.h>
-
-#define LED_PIN 2  // Chân GPIO2 (LED tích hợp trên ESP32)
-
-void blinkTask(void *parameter) {
-    while (1) {
-        digitalWrite(LED_PIN, HIGH);  // Bật LED
-        vTaskDelay(500 / portTICK_PERIOD_MS); // Chờ 500ms
-        digitalWrite(LED_PIN, LOW);   // Tắt LED
-        vTaskDelay(500 / portTICK_PERIOD_MS); // Chờ 500ms
-    }
-}
+// #include "tasks.h"
+#include "display.h"
+#include "sensor.h"
+#include "communication.h"
+#include "wifi_scan.h"
 
 void setup() {
-    pinMode(LED_PIN, OUTPUT);  // Đặt chân LED là OUTPUT
-    xTaskCreate(blinkTask, "Blink LED", 1024, NULL, 1, NULL); // Tạo task RTOS
+    Serial.begin(115200);
+    
+    // Khởi tạo các thành phần
+    display_init();
+    // sensor_init();
+    // wiFiScanInit();
+
+    // Tạo các task
+    xTaskCreate(vTaskDisplay, "TaskDisplay", 4096, NULL, 1, NULL);
+    // xTaskCreate(vTaskSensor, "TaskSensor", 4096, NULL, 1, NULL);
+    // xTaskCreate(vTaskCommunication, "TaskComm", 4096, NULL, 1, NULL);
+    // xTaskCreate(vTaskUpdateWiFiScan, "TaskWiFiScan", 4096, NULL, 1, NULL);
+    // xTaskCreate(vTaskSendDataToServer, "TaskSendData", 4096, NULL, 1, NULL);
 }
 
 void loop() {
-    vTaskDelay(1000 / portTICK_PERIOD_MS); // Nhàn rỗi (FreeRTOS chạy task riêng)
+    // vTaskDelay(1000 / portTICK_PERIOD_MS); // Để FreeRTOS chạy task
 }
